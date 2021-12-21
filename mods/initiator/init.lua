@@ -249,6 +249,15 @@ minetest.register_on_joinplayer(function(player, last_login)
     player:set_inventory_formspec(get_inventory_formspec())
     player:hud_set_hotbar_itemcount(3)
 
+    -- Remove hearts, etc
+    player:hud_set_flags({hotbar = true,
+                          healthbar = false,
+                          crosshair = nil,
+                          wielditem = true,
+                          breathbar = false,
+                          minimap=false,
+                          minimap_radar=false})
+
     if player:get_inventory():is_empty("main") then
       restart_game(player)
     end

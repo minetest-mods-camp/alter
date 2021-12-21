@@ -15,12 +15,14 @@ minetest.register_item(":", {
 minetest.register_node(modname .. ":unbreakable", {
                          description = "Unbreakable block",
                          tiles = {"mirror_unbreakable.png"},
+                         groups = {fall_damage_add_percent = -100}
                          -- groups = {crumbly=2} -- TODO FIXME
 })
 
 minetest.register_node(modname .. ":unbreakable_interior", {
                          description = "Unbreakable block",
                          tiles = {"mirror_unbreakable_interior.png"},
+                         groups = {fall_damage_add_percent = -100}
                          -- groups = {crumbly=2} -- TODO FIXME
 })
 
@@ -180,4 +182,5 @@ function register_mirror_node(name, extra)
   minetest.register_node(modname .. ":" .. name, definition)
 end
 
-register_mirror_node("grey", {groups = {crumbly=2}})
+register_mirror_node("grey", {groups = {crumbly=2,
+                                        fall_damage_add_percent = -100}})
