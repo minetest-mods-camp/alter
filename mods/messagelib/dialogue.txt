@@ -1,0 +1,17 @@
+A dialogue is a table with:
+* speaker
+  title of the dialogue
+* text
+  main text of the dialogue
+* update_self(player, dialogue) (optional)
+  function that updates the dialogue (runs before it is shown)
+* successors (optional)
+  branch points
+
+Each successor has:
+* option_text
+  text shown on parent dialogue
+* on_choose(player) (optional)
+  a function that runs when this option is chosen
+* dialogue (optional)
+  another dialogue to show. This is just a shortcut for including it another send_dialogue in on_choose

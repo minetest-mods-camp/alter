@@ -1,0 +1,28 @@
+License links:
+* CC BY 3.0: https://creativecommons.org/licenses/by/3.0/
+* CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/
+ 
+metallic_voice:
+* link: https://freesound.org/people/kwahmah_02/sounds/246332/
+* Author: kwahmah_02
+* License: CC BY 3.0
+ 
+error:
+* link: https://freesound.org/people/BloodPixelHero/sounds/572936/
+* Author: BloodPixelHero
+* License: CC0 1.0
+
+success:
+* link: https://freesound.org/people/thisusernameis/sounds/426889/
+* Author: thisusernameis
+* License: CC0 1.0
+
+mirror_place:
+* link: https://freesound.org/people/Sergenious/sounds/55843/
+* Author: Sergenious
+* License: CC BY 3.0
+
+teleport:
+* link: https://freesound.org/people/GameAudio/sounds/220163/
+* Author: GameAudio
+* License: CC0 1.0
