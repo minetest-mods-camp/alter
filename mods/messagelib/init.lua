@@ -147,9 +147,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
       return true
     end
 
-    -- TODO This doesn't work very well right now
     if fields["quit"] then
-      messagelib.send_dialogue(name, dialogue)
+        minetest.after(0.15, messagelib.send_dialogue, name, dialogue)
       return true
     end
 
