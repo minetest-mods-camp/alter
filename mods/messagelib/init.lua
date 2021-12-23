@@ -7,12 +7,10 @@
 local modname = minetest.get_current_modname()
 local modpath = minetest.get_modpath(modname)
 
+messagelib = {}
 
 -- Manage open dialogues by different players
 local _dialogues = {}
-local function get_dialogue(user)
-  return _dialogues[user] or {}
-end
 
 -- Clear dialogue if the user leaves
 minetest.register_on_leaveplayer(function(player)
@@ -20,18 +18,17 @@ minetest.register_on_leaveplayer(function(player)
 end)
 
 -- Define the dialogue metatable
-dialogue_defaults = {
+messagelib.dialogue_defaults = {
   -- position
   -- background
   -- decorators
   -- text styling
   -- size
 }
+local dialogue = {}
+dialogue.__index = messagelib.dialogue_defaults
 
-dialogue = {}
-dialogue.__index = dialogue_defaults
-
-function get_dialogue_formspec(playername, dialogue)
+local function get_dialogue_formspec(playername, dialogue)
 
   -- Generate Answer choices formspec
   -- TODO Alignment of button text
@@ -68,7 +65,17 @@ function get_dialogue_formspec(playername, dialogue)
   return table.concat(formspec, "")
 end
 
-function send_dialogue(playername, dtable)
+-- TODO Add "register_character" command to have a picture and voice associated.
+-- For now, the registration is just the sound, but this can be expanded later to
+-- contain various character states as well.
+function messagelib.register_character(name, registration)
+  if not messagelib.characters then
+    messagelib.characters = {}
+  end
+  messagelib.characters[name] = registration
+end
+
+function messagelib.send_dialogue(playername, dtable)
   setmetatable(dtable, dialogue)
 
 
@@ -82,20 +89,13 @@ function send_dialogue(playername, dtable)
   minetest.show_formspec(playername, modname .. ":dialogue",
                          get_dialogue_formspec(playername, dtable))
 
-  -- TODO Add "register_character" command to have a picture and voice associated
-  if dtable["speaker"] == "Metallic Voice" then
-    -- TODO Add length control
-    -- local length = #dtable["text"] / 250
-
-    sound = minetest.sound_play(
-      {name = "metallic_voice"},
-      {to_player = playername,
-       -- loop=true
-      },
-      false
-    )
-    -- minetest.after(length, minetest.sound_stop, sound)
-    -- FIXME play sound
+  -- Sound
+  -- TODO Add length control
+  -- TODO Add other sound controls too (function for custom sound?)
+  for k, reg in pairs(messagelib.characters) do
+    if dtable["speaker"] == k then
+      minetest.sound_play({name = reg.sound}, {to_player = playername})
+    end
   end
 end
 
@@ -114,7 +114,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
     -- TODO This doesn't work very well right now
     if fields["quit"] then
-      send_dialogue(name, dialogue)
+      messagelib.send_dialogue(name, dialogue)
       return true
     end
 
@@ -133,7 +133,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
       end
 
       if pressed.dialogue then
-        send_dialogue(name, pressed.dialogue)
+        messagelib.send_dialogue(name, pressed.dialogue)
       else
         minetest.close_formspec(name, modname .. ":dialogue")
       end

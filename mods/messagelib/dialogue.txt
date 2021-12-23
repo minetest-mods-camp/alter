@@ -15,3 +15,16 @@ Each successor has:
   a function that runs when this option is chosen
 * dialogue (optional)
   another dialogue to show. This is just a shortcut for including it another send_dialogue in on_choose
+
+A character registration has:
+* sound
+  sound to be played with this character
+
+
+API
+----
+messagelib.register_character(name, registration)
+* name is matched with speaker for each dialogue
+* registration is a character registration
+
+messagelib.send_dialogue(playername, dialogue)

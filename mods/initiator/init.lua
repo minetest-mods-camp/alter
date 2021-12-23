@@ -1,9 +1,13 @@
 local storage = minetest.get_mod_storage()
+local send_dialogue = messagelib.send_dialogue
 
 num_teleporters = 25
 if storage:get_int("num_human") == 0 then
   storage:set_int("num_human", 31476)
 end
+
+-- Register Metallic Voice character
+messagelib.register_character("Metallic Voice", {sound = "metallic_voice"})
 
 -- TODO Add helper functions to messagelib: (linear_layout, branch, etc)
 local tutorial_successor = {
