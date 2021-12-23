@@ -1,3 +1,6 @@
+-- Alter initiator mod: Controls the overall flow of the game
+-- Copyright (C) 2021  Yaman Qalieh
+
 local storage = minetest.get_mod_storage()
 local send_dialogue = messagelib.send_dialogue
 

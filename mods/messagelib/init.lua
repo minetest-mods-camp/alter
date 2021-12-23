@@ -1,5 +1,6 @@
--- TODO License
---
+-- messagelib: A library for message dialogues in Minetest
+-- Copyright (C) 2021  Yaman Qalieh
+
 -- TODO internationalization intlib (this line:
 -- local S, NS = dofile(mymod_path .. "/intllib.lua")
 -- )

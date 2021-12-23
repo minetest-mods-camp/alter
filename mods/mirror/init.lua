@@ -1,3 +1,6 @@
+-- Alter mirror mod: Creates nodes and items needed for the game.
+-- Copyright (C) 2021  Yaman Qalieh
+
 alter = {}
 
 local modname = minetest.get_current_modname()
