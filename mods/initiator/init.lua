@@ -47,7 +47,7 @@ local first_dialogue = {
   end,
   successors = {
     {
-      option_text = "I never asked for this...",
+      option_text = "1. I never asked for this...",
       dialogue = {
         update_self = function(player, dialogue)
           dialogue.successors = {tutorial_successor}
@@ -58,7 +58,7 @@ local first_dialogue = {
       }
     },
     {
-      option_text = "Alright! Let's get started!",
+      option_text = "2. Alright! Let's get started!",
       on_choose = function(player)
         num_teleporters = num_teleporters - 3
       end,
