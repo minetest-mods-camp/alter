@@ -28,3 +28,20 @@ messagelib.register_character(name, registration)
 * registration is a character registration
 
 messagelib.send_dialogue(playername, dialogue)
+
+messagelib.linear_layout(speaker, sequence)
+* Creates a dialogue tree from a sequence of alternating text and option lines for a linear layout
+  This is useful for tutorial dialogues and other longer dialogues
+* speaker is the speaker associated with each dialogue text. To override this, see sequence
+* sequence is a list of values alternating between dialogue and option texts.
+  Alternatively, any item in the sequence can be a table, where it will override the defaults,
+  allowing for custom update_self, on_choose, speaker, and other dialogue options.
+* Example:
+  messagelib.linear_layout(
+  "Tutorial Master",
+  {"To go forward, press the w key",      -- dialogue text
+   "Everyone knows that",                 -- option_text
+   {speaker = "Tired Tutorial Master",    -- dialogue text
+   text = "To go back, press the s key"},
+   "Ok",                                  -- option_text
+  })

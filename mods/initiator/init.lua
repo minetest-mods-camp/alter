@@ -9,48 +9,32 @@ end
 -- Register Metallic Voice character
 messagelib.register_character("Metallic Voice", {sound = "metallic_voice"})
 
--- TODO Add helper functions to messagelib: (linear_layout, branch, etc)
 local tutorial_successor = {
   option_text = "Continue",
-  dialogue = {
-    speaker = "Metallic Voice",
-    text = "Your body has been surgically modified into a permanent state of quantum entanglement across the alter dimension.",
-    successors = {
-      {
-        option_text = "I don't understand",
-        dialogue = {
-          speaker = "Metallic Voice",
-          text = "Apologies. My calculations for your intelligence were inflated. This explanation should be adequate: 'Placing blocks on this side makes them appear on the other side'",
-          successors = {
-            {
-              option_text = "Oh I see",
-              dialogue = {
-                speaker = "Metallic Voice",
-                update_self = function(player, dialogue)
-                  dialogue.text = "You will also need these to reverse the quantum alt— This information is wasted on you. Drinking this will move you to the other side. If you use all of them, trials will proceed with Human #" .. (storage:get_int("num_human") + 1) .. ". Now go push that button on the other side."
-                  return dialogue
-                end,
-                successors = {
-                  {
-                    option_text = "Ok.",
-                    on_choose = function(player)
-                      local number = num_teleporters + storage:get_int("handicap")
-                      if number <= 0 then
-                        return
-                      end
-                      local stack = ItemStack("mirror:teleporter " .. number)
-                      player:get_inventory():add_item("main", stack)
-                    end
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+  dialogue = messagelib.linear_layout(
+    "Metallic Voice",
+    {"Your body has been surgically modified into a permanent state of quantum entanglement across the alter dimension.",
+     "I don't understand",
+     "Apologies. My calculations for your intelligence were inflated. This explanation should be adequate: 'Placing blocks on this side makes them appear on the other side'",
+     "Oh I see",
+     {update_self = function(player, dialogue)
+        dialogue.text = "You will also need these to reverse the quantum alt— This information is wasted on you. Drinking this will move you to the other side. If you use all of them, trials will proceed with Human #" .. (storage:get_int("num_human") + 1) .. ". Now go push that button on the other side."
+        return dialogue
+     end},
+     {option_text = "Ok.",
+      on_choose = function(player)
+        local number = num_teleporters + storage:get_int("handicap")
+        if number <= 0 then
+          return
+        end
+        local stack = ItemStack("mirror:teleporter " .. number)
+        player:get_inventory():add_item("main", stack)
+     end}
+  })
 }
+
+
+-- TODO Add helper functions to messagelib: (branch, etc)
 
 local first_dialogue = {
   speaker = "Metallic Voice",

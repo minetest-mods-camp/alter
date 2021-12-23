@@ -99,6 +99,40 @@ function messagelib.send_dialogue(playername, dtable)
   end
 end
 
+-- Returns a nested dialogue tree from a table of lines
+-- This can be expanded on to add other dialogue properties
+function messagelib.linear_layout(speaker, sequence)
+  local dialogue = nil
+  for i = (#sequence - 1), 1, -2 do
+    curr_dialogue = {
+      speaker = speaker,
+      successors = {}
+    }
+    -- Dialogue overrides
+    if type(sequence[i]) == "table" then
+      for k, v in pairs(sequence[i]) do
+        curr_dialogue[k] = v
+      end
+    else
+      curr_dialogue.text = sequence[i]
+    end
+
+    -- Option text overrides
+    if type(sequence[i + 1]) == "table" then
+      curr_dialogue.successors[1] = sequence[i + 1]
+    else
+      curr_dialogue.successors[1] = {option_text = sequence[i + 1]}
+    end
+
+    if dialogue then
+      curr_dialogue.successors[1].dialogue = dialogue
+    end
+    dialogue = curr_dialogue
+  end
+
+  return dialogue
+end
+
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
     -- Exit if it's not the form for this mod
