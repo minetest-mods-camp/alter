@@ -1,5 +1,7 @@
+alter = {}
+
 local modname = minetest.get_current_modname()
-local tau = 6.283
+local tau = 2 * math.pi
 
 minetest.register_item(":", {
                          type="none",
@@ -12,40 +14,57 @@ minetest.register_item(":", {
                          }
 })
 
-minetest.register_node(modname .. ":unbreakable", {
-                         description = "Unbreakable block",
-                         tiles = {"mirror_unbreakable.png"},
-                         groups = {fall_damage_add_percent = -100}
-                         -- groups = {crumbly=2} -- TODO FIXME
-})
+function alter.register_node(name, extra)
+  local definition = {
+    tiles = {"alter_" .. name .. ".png"},
+    stack_max = 1000,
+    groups = {fall_damage_add_percent = -100, instant_break=1}
+  }
 
-minetest.register_node(modname .. ":unbreakable_interior", {
-                         description = "Unbreakable block",
-                         tiles = {"mirror_unbreakable_interior.png"},
-                         groups = {fall_damage_add_percent = -100}
-                         -- groups = {crumbly=2} -- TODO FIXME
-})
+  if extra then
+    for k,v in pairs(extra) do
+      definition[k] = v
+    end
+  end
 
-minetest.register_node(modname .. ":unbreakable_glass", {
-                         description = "Unbreakable separator",
-                         tiles = {"mirror_unbreakable_glass.png"},
-                         use_texture_alpha = "blend",
-                         drawtype="glasslike_framed",
-                         sunlight_propagates=true,
-                         paramtype = "light",
-                         -- paramtype2 = "glasslikeliquidlevel",
-                         -- groups = {crumbly=2} -- TODO FIXME
+  minetest.register_node(modname .. ":" .. name, definition)
+end
 
-})
+function alter.register_mirror_node(name, extra)
+  local definition = {
+    node_placement_prediction = "air",
+    on_drop = function(itemstack, dropper, pos)
+      return itemstack
+    end,
+    after_place_node = function(pos, placer, itemstack, pointed_thing)
+      minetest.remove_node(pos)
+      pos.x = -1 * pos.x
+      local other = minetest.get_node_or_nil(pos)
+      if not other or other.name ~= "air" then
+        minetest.sound_play({name="error"},
+          {to_player=placer:get_player_name(),
+           pitch = 1.3},
+          true)
+        return true
+      else
+        minetest.sound_play({name="mirror_place"},
+          {gain=3, pitch=1.5}, true)
+        minetest.set_node(pos, {name = modname .. ":" .. name})
+      end
+    end,
+  }
 
-minetest.register_node(modname .. ":light", {
-                         tiles = {"mirror_light.png"},
-                         light_source = minetest.LIGHT_MAX,
-                         sunlight_propagates=true
-})
+  if extra then
+    for k,v in pairs(extra) do
+      definition[k] = v
+    end
+  end
+
+  alter.register_node(name, definition)
+end
 
 minetest.register_node(modname .. ":door", {
-                         tiles = {"mirror_door.png"},
+                         tiles = {"alter_door.png"},
                          on_punch = function(pos, node, puncher, pointed_thing)
                            if puncher:get_pos().z - pos.z > -1 then
                              -- Remove barrier
@@ -56,13 +75,13 @@ minetest.register_node(modname .. ":door", {
 
                              -- Close behind
                              pos.z = pos.z - 1
-                             minetest.set_node(pos, {name = "mirror:unbreakable"})
+                             minetest.set_node(pos, {name = modname .. ":unbreakable"})
                              pos.y = pos.y + 1
-                             minetest.set_node(pos, {name = "mirror:unbreakable"})
+                             minetest.set_node(pos, {name = modname .. ":unbreakable"})
 
                              -- Only teleporters go to the next part
                              local inv = puncher:get_inventory()
-                             local stack = ItemStack("mirror:teleporter " .. 99)
+                             local stack = ItemStack(modname .. ":teleporter " .. 99)
                              stack = inv:remove_item("main", stack)
                              inv:set_list("main", {})
                              inv:add_item("main", stack)
@@ -87,8 +106,7 @@ minetest.register_node(modname .. ":door", {
 })
 
 minetest.register_craftitem(modname .. ":teleporter", {
-                              description = "A potion to transport to the other side of the mirror world",
-                              inventory_image = "mirror_teleporter.png",
+                              inventory_image = "alter_teleporter.png",
                               stack_max = 1000,
                               on_drop = function(itemstack, dropper, pos)
                                   return itemstack
@@ -147,40 +165,19 @@ minetest.register_craftitem(modname .. ":teleporter", {
                               end
 })
 
-function register_mirror_node(name, extra)
-  local definition = {
-    tiles = {"mirror_" .. name .. ".png"},
-    node_placement_prediction = "air",
-    stack_max = 1000,
-    on_drop = function(itemstack, dropper, pos)
-      return itemstack
-    end,
-    after_place_node = function(pos, placer, itemstack, pointed_thing)
-      minetest.remove_node(pos)
-      pos.x = -1 * pos.x
-      local other = minetest.get_node_or_nil(pos)
-      if not other or other.name ~= "air" then
-        minetest.sound_play({name="error"},
-          {to_player=placer:get_player_name(),
-           pitch = 1.3},
-          true)
-        return true
-      else
-        minetest.sound_play({name="mirror_place"},
-          {gain=3, pitch=1.5}, true)
-        minetest.set_node(pos, {name = modname .. ":" .. name})
-      end
-    end,
-  }
-
-  if extra then
-    for k,v in pairs(extra) do
-      definition[k] = v
-    end
-  end
-
-  minetest.register_node(modname .. ":" .. name, definition)
-end
-
-register_mirror_node("grey", {groups = {crumbly=2,
-                                        fall_damage_add_percent = -100}})
+alter.register_node("unbreakable")
+alter.register_node("unbreakable_interior")
+alter.register_node("unbreakable_glass", {
+                      use_texture_alpha = "blend",
+                      drawtype="glasslike_framed",
+                      sunlight_propagates=true,
+                      paramtype = "light"
+})
+alter.register_node("light", {
+                      light_source = minetest.LIGHT_MAX,
+                      sunlight_propagates=true
+})
+alter.register_mirror_node("grey", { -- TODO This block is actually blue
+                       groups = {crumbly=2,
+                                 instant_break = 1, fall_damage_add_percent = -100}
+})
