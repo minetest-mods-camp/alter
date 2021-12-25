@@ -1,33 +1,48 @@
-A dialogue is a table with:
-* speaker
-  title of the dialogue
-* text
-  main text of the dialogue
-* update_self(player, dialogue) (optional)
-  function that updates the dialogue (runs before it is shown)
-* successors (optional)
-  branch points
+Data Types
+----------
 
-Each successor has:
+dialogue is a table with:
+* speaker [nil]
+  title of the dialogue
+* text [nil]
+  main text of the dialogue
+* update_self(player, dialogue) -> dialogue [nil]
+  function that updates the dialogue (runs before it is shown)
+* successors [nil]
+  branch points
+* successors_style [{border = "false"}]
+  key value pairs do define styles for successors
+* successors_style_hovered [{textcolor = "yellow"}]
+  same as above but with the hovered style
+* number_successors [true]
+  a bool to mark if each successor should be prepended with a number
+The default values in brackets above can be modified with messagelib.set_default
+
+successor is a table with:
 * option_text
   text shown on parent dialogue
-* on_choose(player) (optional)
+* on_choose(player) -> nil (optional)
   a function that runs when this option is chosen
 * dialogue (optional)
   another dialogue to show. This is just a shortcut for including it another send_dialogue in on_choose
 
-A character registration has:
+registration is a table with:
 * sound
   sound to be played with this character
 
 
-API
-----
+Functions
+---------
+
 messagelib.register_character(name, registration)
 * name is matched with speaker for each dialogue
 * registration is a character registration
 
 messagelib.send_dialogue(playername, dialogue)
+
+messagelib.set_default(dialogue)
+* Sets the default values for dialogues using the keys and values in this table. This is useful for
+  styling changes.
 
 messagelib.linear_layout(speaker, sequence)
 * Creates a dialogue tree from a sequence of alternating text and option lines for a linear layout

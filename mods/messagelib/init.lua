@@ -5,29 +5,26 @@
 -- local S, NS = dofile(mymod_path .. "/intllib.lua")
 -- )
 
-local modname = minetest.get_current_modname()
-local modpath = minetest.get_modpath(modname)
 
 messagelib = {}
 
+messagelib.modname = minetest.get_current_modname()
+messagelib.modpath = minetest.get_modpath(messagelib.modname)
+
 -- Manage open dialogues by different players
-local _dialogues = {}
+messagelib._dialogues = {}
 
--- Clear dialogue if the user leaves
-minetest.register_on_leaveplayer(function(player)
-    _dialogues[player:get_player_name()] = nil
-end)
+-------------
+-- Helpers --
+-------------
 
--- Define the dialogue metatable
-messagelib.dialogue_defaults = {
-  -- position
-  -- background
-  -- decorators
-  -- text styling
-  -- size
-}
-local dialogue = {}
-dialogue.__index = messagelib.dialogue_defaults
+local function to_formspec_style(t)
+  local style = ""
+  for k, v in pairs(t) do
+    style = style .. ";" .. k .. "=" .. v
+  end
+  return style
+end
 
 local function get_dialogue_formspec(playername, dialogue)
 
@@ -39,12 +36,24 @@ local function get_dialogue_formspec(playername, dialogue)
     table.insert(choices, "container[0.05, 2.7]")
     for i, val in ipairs(dialogue.successors) do
       local id = "dialogue_choice_" .. i
-      local choice_formspec = {
-          "style[" .. id .. ";border=false]",
-          "style[" .. id ..":hovered;textcolor=yellow]",
-          "button[0,"..(i*0.63)..";10,0.5;" .. id .. ";" .. minetest.formspec_escape(val.option_text) .. "]"
-      }
-      table.insert(choices, table.concat(choice_formspec, ""))
+      local text = minetest.formspec_escape(val.option_text)
+
+      -- Add numbering to text
+      if dialogue.number_successors then
+        text = i .. ". " .. text
+      end
+
+      -- Create styles
+      if dialogue.successors_style then
+        table.insert(choices,
+                     "style[" .. id .. to_formspec_style(dialogue.successors_style) .. "]")
+      end
+      if dialogue.successors_style_hovered then
+        table.insert(choices,
+                     "style[" .. id .. ":hovered" .. to_formspec_style(dialogue.successors_style_hovered) .. "]")
+      end
+
+      table.insert(choices, "button[0,"..(i*0.63)..";10,0.5;"..id..";"..text.."]")
     end
     table.insert(choices, "container_end[]")
   end
@@ -66,6 +75,81 @@ local function get_dialogue_formspec(playername, dialogue)
   return table.concat(formspec, "")
 end
 
+---------------
+-- Callbacks --
+---------------
+
+-- Clear dialogue if the user leaves
+minetest.register_on_leaveplayer(function(player)
+    messagelib._dialogues[player:get_player_name()] = nil
+end)
+
+minetest.register_on_player_receive_fields(function(player, formname, fields)
+    -- Exit if it's not the form for this mod
+    if formname ~= messagelib.modname .. ":dialogue" then
+      return
+    end
+
+    local name = player:get_player_name()
+    local dialogue = messagelib._dialogues[name]
+    if not dialogue then
+      return true
+    end
+
+    if fields["quit"] then
+        minetest.after(0.15, messagelib.send_dialogue, name, dialogue)
+      return true
+    end
+
+    local pressed = nil
+    for i, val in ipairs(dialogue.successors) do
+      local id = "dialogue_choice_" .. i
+      if fields[id] then
+        pressed = val
+        break
+      end
+    end
+
+    if pressed then
+      if pressed.on_choose then
+        pressed.on_choose(player)
+      end
+
+      if pressed.dialogue then
+        messagelib.send_dialogue(name, pressed.dialogue)
+      else
+        minetest.close_formspec(name, messagelib.modname .. ":dialogue")
+      end
+    end
+
+    return true
+end)
+
+---------
+-- API --
+---------
+
+-- Define the dialogue metatable
+messagelib.dialogue_defaults = {
+  -- position
+  -- background
+  -- decorators
+  -- text styling
+  successors_style = {border = "false"},
+  successors_style_hovered = {textcolor = "yellow"},
+  number_successors = true
+}
+local dialogue = {}
+dialogue.__index = messagelib.dialogue_defaults
+
+
+function messagelib.set_default(dtable)
+  for k, v in pairs(dtable) do
+    messagelib.dialogue_defaults[k] = v
+  end
+  dialogue.__index = messagelib.dialogue_defaults
+end
+
 -- TODO Add "register_character" command to have a picture and voice associated.
 -- For now, the registration is just the sound, but this can be expanded later to
 -- contain various character states as well.
@@ -85,9 +169,9 @@ function messagelib.send_dialogue(playername, dtable)
     dtable = dtable.update_self(minetest.get_player_by_name(playername), dtable)
   end
 
-  _dialogues[playername] = dtable
+  messagelib._dialogues[playername] = dtable
 
-  minetest.show_formspec(playername, modname .. ":dialogue",
+  minetest.show_formspec(playername, messagelib.modname .. ":dialogue",
                          get_dialogue_formspec(playername, dtable))
 
   -- Sound
@@ -133,45 +217,3 @@ function messagelib.linear_layout(speaker, sequence)
 
   return dialogue
 end
-
-
-minetest.register_on_player_receive_fields(function(player, formname, fields)
-    -- Exit if it's not the form for this mod
-    if formname ~= modname .. ":dialogue" then
-      return
-    end
-
-    local name = player:get_player_name()
-    local dialogue = _dialogues[name]
-    if not dialogue then
-      return true
-    end
-
-    if fields["quit"] then
-        minetest.after(0.15, messagelib.send_dialogue, name, dialogue)
-      return true
-    end
-
-    local pressed = nil
-    for i, val in ipairs(dialogue.successors) do
-      local id = "dialogue_choice_" .. i
-      if fields[id] then
-        pressed = val
-        break
-      end
-    end
-
-    if pressed then
-      if pressed.on_choose then
-        pressed.on_choose(player)
-      end
-
-      if pressed.dialogue then
-        messagelib.send_dialogue(name, pressed.dialogue)
-      else
-        minetest.close_formspec(name, modname .. ":dialogue")
-      end
-    end
-
-    return true
-end)
