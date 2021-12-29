@@ -222,7 +222,6 @@ function restart_game(player)
   place_levels()
   -- Always day
   player:override_day_night_ratio(1)
-  minetest.settings:set("time_speed", 0)
   -- teleport
   local pos = {x=5, y=6.5, z=1}
   player:set_pos(pos)
