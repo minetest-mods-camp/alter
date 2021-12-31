@@ -21,7 +21,7 @@ function alter.register_node(name, extra)
   local definition = {
     tiles = {"alter_" .. name .. ".png"},
     stack_max = 1000,
-    groups = {fall_damage_add_percent = -100, instant_break=1}
+    groups = {instant_break=1}
   }
 
   if extra then
@@ -182,5 +182,5 @@ alter.register_node("light", {
 })
 alter.register_mirror_node("grey", { -- TODO This block is actually blue
                        groups = {crumbly=2,
-                                 instant_break = 1, fall_damage_add_percent = -100}
+                                 instant_break = 1}
 })

@@ -239,6 +239,8 @@ minetest.register_on_joinplayer(function(player, last_login)
     player:set_inventory_formspec(get_inventory_formspec())
     player:hud_set_hotbar_itemcount(3)
 
+    player:set_armor_groups({immortal = 1})
+
     -- Remove hearts, etc
     player:hud_set_flags({hotbar = true,
                           healthbar = false,
