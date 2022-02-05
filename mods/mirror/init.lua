@@ -97,12 +97,17 @@ minetest.register_node(modname .. ":door", {
                              -- TODO Bug: If player restarts immediately after completing level, things break.
                              minetest.after(1.5, show_level_end_dialogue, puncher)
                            else
-                             -- TODO This is a dependency issue
-                             show_incomplete_level_dialogue(puncher)
                              minetest.sound_play({name="error"},
                                {to_player=puncher:get_player_name(),
                                 pitch = 1.3},
                                true)
+
+                             -- TODO This is a dependency issue
+                             local pmeta = puncher:get_meta()
+                             if pmeta:get_int("alter_mirror:button_distance") == 0 then
+                               pmeta:set_int("alter_mirror:button_distance", 1)
+                               show_incomplete_level_dialogue(puncher)
+                             end
                            end
 
                          end
