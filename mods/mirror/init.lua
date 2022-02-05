@@ -180,7 +180,7 @@ alter.register_node("light", {
                       light_source = minetest.LIGHT_MAX,
                       sunlight_propagates=true
 })
-alter.register_mirror_node("grey", { -- TODO This block is actually blue
+alter.register_mirror_node("blue", {
                        groups = {crumbly=2,
                                  instant_break = 1}
 })
