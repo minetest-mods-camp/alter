@@ -1,0 +1,9 @@
+#+TITLE: Contributing
+
+This document details the general architecture of the project
+* initator
+Contains the core game logic in terms of play flow. This includes the world schematic(s), dialogue lines, hud manipulations, etc.
+* mirror
+This defines the nodes and items of the game.
+* messagelib
+This defines the dialogue library that is used in the game. It will eventually be separated into its own repository.
