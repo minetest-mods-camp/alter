@@ -177,13 +177,17 @@ function show_death_dialogue(player)
     end,
     successors = {
       {
-        option_text = "No! I can still make it!",
+        option_text = "No, please! I can still make it!",
+        on_choose = function(player)
+            local stack = ItemStack("mirror:teleporter " .. num_teleporters)
+            player:get_inventory():add_item("main", stack)
+        end,
         dialogue = {
           speaker = "Metallic Voice",
-          text = "Very well. I will leave you here until you give up and open your inventory.",
+          text = "Very well. I will give you another chance.",
           successors = {
             {
-              option_text = "Ok",
+              option_text = "Thank you!",
             }
           }
         }
