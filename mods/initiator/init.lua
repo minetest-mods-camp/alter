@@ -26,11 +26,7 @@ local tutorial_successor = {
      end},
      {option_text = "Ok.",
       on_choose = function(player)
-        local number = num_teleporters + storage:get_int("handicap")
-        if number <= 0 then
-          return
-        end
-        local stack = ItemStack("mirror:teleporter " .. number)
+        local stack = ItemStack("mirror:teleporter " .. num_teleporters)
         player:get_inventory():add_item("main", stack)
      end}
   })
@@ -126,11 +122,7 @@ function show_level_end_dialogue(player)
         option_text = "Continue",
         on_choose = function(player)
           if level_texts[level].teleporter then
-            local count = level_texts[level].teleporter + storage:get_int("handicap")
-            if count <= 0 then
-              return
-            end
-            local stack = ItemStack("mirror:teleporter " .. count)
+            local stack = ItemStack("mirror:teleporter " .. level_texts[level].teleporter)
             player:get_inventory():add_item("main", stack)
           end
         end
@@ -140,12 +132,7 @@ function show_level_end_dialogue(player)
   if level == 9 then -- Last level
     -- TODO Adjust difficulty
     dialogue.successors[1].dialogue = first_dialogue
-    dialogue.successors[1].on_choose = function(player)
-      local handicap = storage:get_int("handicap")
-      storage:set_int("handicap", handicap - 10)
-
-      restart_game(player)
-    end
+    dialogue.successors[1].on_choose = restart_game
   end
   send_dialogue(player:get_player_name(), dialogue)
   storage:set_int("level", level + 1)
@@ -170,11 +157,6 @@ function show_death_dialogue(player)
   local dialogue = {
     speaker = "Metallic Voice",
     text = "Your performance is unsatisfactory. Proceeding with Human #" .. (storage:get_int("num_human") + 1) .. ". Potion rations will be adjusted accordingly.",
-    update_self = function(player, dialogue)
-      local handicap = storage:get_int("handicap")
-      storage:set_int("handicap", handicap + 2)
-      return dialogue
-    end,
     successors = {
       {
         option_text = "No, please! I can still make it!",
