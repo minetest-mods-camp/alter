@@ -26,7 +26,7 @@ local tutorial_successor = {
      end},
      {option_text = "Ok.",
       on_choose = function(player)
-        local stack = ItemStack("mirror:teleporter " .. num_teleporters)
+        local stack = ItemStack("alter_mirror:teleporter " .. num_teleporters)
         player:get_inventory():add_item("main", stack)
      end}
   })
@@ -122,7 +122,7 @@ function show_level_end_dialogue(player)
         option_text = "Continue",
         on_choose = function(player)
           if level_texts[level].teleporter then
-            local stack = ItemStack("mirror:teleporter " .. level_texts[level].teleporter)
+            local stack = ItemStack("alter_mirror:teleporter " .. level_texts[level].teleporter)
             player:get_inventory():add_item("main", stack)
           end
         end
