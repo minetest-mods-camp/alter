@@ -195,7 +195,7 @@ end
 
 local function place_levels()
   local schem_pos = {x=-10, y=5, z=0}
-  minetest.place_schematic(schem_pos, minetest.get_modpath("initiator").."/schems/levels.mts", "0", nil, true)
+  minetest.place_schematic(schem_pos, minetest.get_modpath("alter_initiator").."/schems/levels.mts", "0", nil, true)
 end
 
 function restart_game(player)
