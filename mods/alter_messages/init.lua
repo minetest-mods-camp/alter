@@ -1,4 +1,4 @@
--- messagelib: A library for message dialogues in Minetest
+-- alter_messages: A library for message dialogues in Minetest
 -- Copyright (C) 2021  Yaman Qalieh
 
 -- TODO internationalization intlib (this line:
@@ -6,13 +6,13 @@
 -- )
 
 
-messagelib = {}
+alter_messages = {}
 
-messagelib.modname = minetest.get_current_modname()
-messagelib.modpath = minetest.get_modpath(messagelib.modname)
+alter_messages.modname = minetest.get_current_modname()
+alter_messages.modpath = minetest.get_modpath(alter_messages.modname)
 
 -- Manage open dialogues by different players
-messagelib._dialogues = {}
+alter_messages._dialogues = {}
 
 -------------
 -- Helpers --
@@ -81,23 +81,23 @@ end
 
 -- Clear dialogue if the user leaves
 minetest.register_on_leaveplayer(function(player)
-    messagelib._dialogues[player:get_player_name()] = nil
+    alter_messages._dialogues[player:get_player_name()] = nil
 end)
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
     -- Exit if it's not the form for this mod
-    if formname ~= messagelib.modname .. ":dialogue" then
+    if formname ~= alter_messages.modname .. ":dialogue" then
       return
     end
 
     local name = player:get_player_name()
-    local dialogue = messagelib._dialogues[name]
+    local dialogue = alter_messages._dialogues[name]
     if not dialogue then
       return true
     end
 
     if fields["quit"] then
-        minetest.after(0.15, messagelib.send_dialogue, name, dialogue)
+        minetest.after(0.15, alter_messages.send_dialogue, name, dialogue)
       return true
     end
 
@@ -116,9 +116,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
       end
 
       if pressed.dialogue then
-        messagelib.send_dialogue(name, pressed.dialogue)
+        alter_messages.send_dialogue(name, pressed.dialogue)
       else
-        minetest.close_formspec(name, messagelib.modname .. ":dialogue")
+        minetest.close_formspec(name, alter_messages.modname .. ":dialogue")
       end
     end
 
@@ -130,7 +130,7 @@ end)
 ---------
 
 -- Define the dialogue metatable
-messagelib.dialogue_defaults = {
+alter_messages.dialogue_defaults = {
   -- position
   -- background
   -- decorators
@@ -140,27 +140,27 @@ messagelib.dialogue_defaults = {
   number_successors = true
 }
 local dialogue = {}
-dialogue.__index = messagelib.dialogue_defaults
+dialogue.__index = alter_messages.dialogue_defaults
 
 
-function messagelib.set_default(dtable)
+function alter_messages.set_default(dtable)
   for k, v in pairs(dtable) do
-    messagelib.dialogue_defaults[k] = v
+    alter_messages.dialogue_defaults[k] = v
   end
-  dialogue.__index = messagelib.dialogue_defaults
+  dialogue.__index = alter_messages.dialogue_defaults
 end
 
 -- TODO Add "register_character" command to have a picture and voice associated.
 -- For now, the registration is just the sound, but this can be expanded later to
 -- contain various character states as well.
-function messagelib.register_character(name, registration)
-  if not messagelib.characters then
-    messagelib.characters = {}
+function alter_messages.register_character(name, registration)
+  if not alter_messages.characters then
+    alter_messages.characters = {}
   end
-  messagelib.characters[name] = registration
+  alter_messages.characters[name] = registration
 end
 
-function messagelib.send_dialogue(playername, dtable)
+function alter_messages.send_dialogue(playername, dtable)
   setmetatable(dtable, dialogue)
 
 
@@ -169,15 +169,15 @@ function messagelib.send_dialogue(playername, dtable)
     dtable = dtable.update_self(minetest.get_player_by_name(playername), dtable)
   end
 
-  messagelib._dialogues[playername] = dtable
+  alter_messages._dialogues[playername] = dtable
 
-  minetest.show_formspec(playername, messagelib.modname .. ":dialogue",
+  minetest.show_formspec(playername, alter_messages.modname .. ":dialogue",
                          get_dialogue_formspec(playername, dtable))
 
   -- Sound
   -- TODO Add length control
   -- TODO Add other sound controls too (function for custom sound?)
-  for k, reg in pairs(messagelib.characters) do
+  for k, reg in pairs(alter_messages.characters) do
     if dtable["speaker"] == k then
       minetest.sound_play({name = reg.sound}, {to_player = playername})
     end
@@ -186,7 +186,7 @@ end
 
 -- Returns a nested dialogue tree from a table of lines
 -- This can be expanded on to add other dialogue properties
-function messagelib.linear_layout(speaker, sequence)
+function alter_messages.linear_layout(speaker, sequence)
   local dialogue = nil
   for i = (#sequence - 1), 1, -2 do
     curr_dialogue = {

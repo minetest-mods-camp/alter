@@ -16,7 +16,7 @@ dialogue is a table with:
   same as above but with the hovered style
 * number_successors [true]
   a bool to mark if each successor should be prepended with a number
-The default values in brackets above can be modified with messagelib.set_default
+The default values in brackets above can be modified with alter_messages.set_default
 
 successor is a table with:
 * option_text
@@ -34,17 +34,17 @@ registration is a table with:
 Functions
 ---------
 
-messagelib.register_character(name, registration)
+alter_messages.register_character(name, registration)
 * name is matched with speaker for each dialogue
 * registration is a character registration
 
-messagelib.send_dialogue(playername, dialogue)
+alter_messages.send_dialogue(playername, dialogue)
 
-messagelib.set_default(dialogue)
+alter_messages.set_default(dialogue)
 * Sets the default values for dialogues using the keys and values in this table. This is useful for
   styling changes.
 
-messagelib.linear_layout(speaker, sequence)
+alter_messages.linear_layout(speaker, sequence)
 * Creates a dialogue tree from a sequence of alternating text and option lines for a linear layout
   This is useful for tutorial dialogues and other longer dialogues
 * speaker is the speaker associated with each dialogue text. To override this, see sequence
@@ -52,7 +52,7 @@ messagelib.linear_layout(speaker, sequence)
   Alternatively, any item in the sequence can be a table, where it will override the defaults,
   allowing for custom update_self, on_choose, speaker, and other dialogue options.
 * Example:
-  messagelib.linear_layout(
+  alter_messages.linear_layout(
   "Tutorial Master",
   {"To go forward, press the w key",      -- dialogue text
    "Everyone knows that",                 -- option_text

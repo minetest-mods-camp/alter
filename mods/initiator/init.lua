@@ -2,7 +2,7 @@
 -- Copyright (C) 2021  Yaman Qalieh
 
 local storage = minetest.get_mod_storage()
-local send_dialogue = messagelib.send_dialogue
+local send_dialogue = alter_messages.send_dialogue
 
 num_teleporters = 25
 if storage:get_int("num_human") == 0 then
@@ -10,11 +10,11 @@ if storage:get_int("num_human") == 0 then
 end
 
 -- Register Metallic Voice character
-messagelib.register_character("Metallic Voice", {sound = "metallic_voice"})
+alter_messages.register_character("Metallic Voice", {sound = "metallic_voice"})
 
 local tutorial_successor = {
   option_text = "Continue",
-  dialogue = messagelib.linear_layout(
+  dialogue = alter_messages.linear_layout(
     "Metallic Voice",
     {"Your body has been surgically modified into a permanent state of quantum entanglement across the alter dimension.",
      "I don't understand",
@@ -33,7 +33,7 @@ local tutorial_successor = {
 }
 
 
--- TODO Add helper functions to messagelib: (branch, etc)
+-- TODO Add helper functions to alter_messages: (branch, etc)
 
 local first_dialogue = {
   speaker = "Metallic Voice",
